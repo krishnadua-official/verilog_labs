@@ -1,0 +1,20 @@
+`timescale 1ns / 1ps
+
+module SignChanger(
+    input [7:0] A_i,
+    input sign_i,
+    output [7:0] D_i,
+    output ovfl_o
+    );
+    
+    //AddSub8 SCA8 (.S_o(A_i));
+    
+    wire [7:0] sc;
+    wire [7:0] decimal;
+    
+    assign decimal = 8'b00000000;
+    assign sc = A_i[7:0] ^ {8{sign_i}};
+    
+    Add8 runADD8 (.A_i(sc),.B_i(decimal), .cin_i(sign_i), .S_o(D_i), .ovfl_o(ovfl_o));
+endmodule
+

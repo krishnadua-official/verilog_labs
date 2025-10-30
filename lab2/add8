@@ -1,0 +1,84 @@
+`timescale 1ns / 1ps
+
+
+
+module Add8(
+    input [7:0] A_i,
+    input [7:0] B_i,
+    input cin_i,
+    output [7:0] S_o,
+    output cout_o,
+    output ovfl_o
+    );
+   
+    wire switch0, switch1, switch2, switch3, switch4, switch5, switch6, switch7;
+
+    fa f0 (
+        .A_i(A_i[0]), 
+        .B_i(B_i[0]), 
+        .cin_i(cin_i),     
+        .cout_o(switch0), 
+        .S_o(S_o[0])
+    );
+    
+    fa f1 (
+        .A_i(A_i[1]), 
+        .B_i(B_i[1]), 
+        .cin_i(switch0),   
+        .cout_o(switch1), 
+        .S_o(S_o[1])
+    );
+    
+    fa f2 (
+        .A_i(A_i[2]), 
+        .B_i(B_i[2]), 
+        .cin_i(switch1),   
+        .cout_o(switch2), 
+        .S_o(S_o[2])
+    );
+    
+    fa f3 (
+        .A_i(A_i[3]), 
+        .B_i(B_i[3]), 
+        .cin_i(switch2),   
+        .cout_o(switch3), 
+        .S_o(S_o[3])
+    );
+    
+    fa f4 (
+        .A_i(A_i[4]), 
+        .B_i(B_i[4]), 
+        .cin_i(switch3),   
+        .cout_o(switch4), 
+        .S_o(S_o[4])
+    );
+    
+    fa f5 (
+        .A_i(A_i[5]), 
+        .B_i(B_i[5]), 
+        .cin_i(switch4),   
+        .cout_o(switch5), 
+        .S_o(S_o[5])
+    );
+    
+    fa f6 (
+        .A_i(A_i[6]), 
+        .B_i(B_i[6]), 
+        .cin_i(switch5),   
+        .cout_o(switch6), 
+        .S_o(S_o[6])
+    );
+    
+    fa f7 (
+        .A_i(A_i[7]), 
+        .B_i(B_i[7]), 
+        .cin_i(switch6),   
+        .cout_o(switch7), 
+        .S_o(S_o[7])
+    );
+    
+    
+    assign ovfl_o = ((A_i[7] & B_i[7] & ~S_o[7]) | (~A_i[7] & ~B_i[7] & S_o[7]));
+    assign cout_o = switch7;
+endmodule
+

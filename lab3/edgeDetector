@@ -1,0 +1,19 @@
+module edgeDetector(
+	input clk_i,
+	input button_o,
+	output edge_o
+	);
+    
+	wire Q_w;
+    
+	FDRE # (.INIT(1'b0)) ff(
+    	.C(clk_i),
+    	.R(1'b0),
+    	.CE(1'b1),
+    	.D(button_o),
+    	.Q(Q_w)
+    	);  
+   	 
+	assign edge_o = button_o & ~Q_w;
+endmodule
+

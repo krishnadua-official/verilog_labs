@@ -1,0 +1,47 @@
+module ringCounter(
+    input clk_i,
+    input advance_i,
+    output [3:0] ring_o
+    
+    );
+    
+    wire [3:0] D_w;
+    wire [3:0] Q_w;
+    
+    FDRE #(.INIT(1'b1)) r1 (
+        .C(clk_i),
+        .R(1'b0),
+        .CE(advance_i),
+        .D(D_w[0]),
+        .Q(Q_w[0])
+        );
+         
+    FDRE #(.INIT(1'b0)) r2 (
+        .C(clk_i),
+        .R(1'b0),
+        .CE(advance_i),
+        .D(D_w[1]),
+        .Q(Q_w[1])
+        );
+         
+    FDRE #(.INIT(1'b0)) r3 (
+        .C(clk_i),
+        .R(1'b0),
+        .CE(advance_i),
+        .D(D_w[2]),
+        .Q(Q_w[2])
+        );
+         
+    FDRE #(.INIT(1'b0)) r4 (
+        .C(clk_i),
+        .R(1'b0),
+        .CE(advance_i),
+        .D(D_w[3]),
+        .Q(Q_w[3])
+        );
+         
+    assign D_w = {Q_w[2:0], Q_w[3]};
+    
+    assign ring_o = Q_w;
+    
+endmodule

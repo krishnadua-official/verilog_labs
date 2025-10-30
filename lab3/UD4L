@@ -1,0 +1,62 @@
+module countUD4L(
+    input clk_i,
+    input up_i,
+    input dw_i,
+    input ld_i,
+    input [3:0] Din_i,
+    output [3:0] Q_o,
+    output utc_o,
+    output dtc_o
+    );
+
+    wire [3:0] Q_w;
+    wire [3:0] S_w;
+    wire [3:0] mux_w;
+    wire [3:0] b_w;
+    wire [3:0] carry_w;
+    assign mux_w = ({4{ld_i}} & Din_i) | (~{4{ld_i}} & Q_w);
+    assign b_w = 4'b0001 ^ {{3{dw_i & ~up_i}}, 1'b0};
+
+    fa fa0( .A_i(mux_w[0]), 
+            .B_i(b_w[0]), 
+            .cin_i(1'b0),       
+            .S_o(S_w[0]), 
+            .Cout_o(carry_w[0]));
+        
+        
+    fa fa1( .A_i(mux_w[1]), 
+            .B_i(b_w[1]), 
+            .cin_i(carry_w[0]), 
+            .S_o(S_w[1]), 
+            .Cout_o(carry_w[1]));
+    fa fa2( .A_i(mux_w[2]), 
+            .B_i(b_w[2]), 
+            .cin_i(carry_w[1]), 
+            .S_o(S_w[2]), 
+            .Cout_o(carry_w[2]));
+    fa fa3(. A_i(mux_w[3]), 
+            .B_i(b_w[3]), 
+            .cin_i(carry_w[2]), 
+            .S_o(S_w[3]), 
+            .Cout_o(carry_w[3]));
+
+    FDRE #(.INIT(1'b0)) ff0 (.C(clk_i), .R(1'b0), .CE((up_i ^ dw_i) 
+    | ld_i), .D((ld_i & Din_i[0]) | (~ld_i & S_w[0])), .Q(Q_w[0]));
+    
+    FDRE #(.INIT(1'b0)) ff1 (.C(clk_i), .R(1'b0), .CE((up_i ^ dw_i) 
+    | ld_i), .D((ld_i & Din_i[1]) | (~ld_i & S_w[1])), .Q(Q_w[1]));
+    
+    FDRE #(.INIT(1'b0)) ff2 (.C(clk_i), .R(1'b0), .CE((up_i ^ dw_i) 
+    | ld_i), .D((ld_i & Din_i[2]) | (~ld_i & S_w[2])), .Q(Q_w[2]));
+    
+    FDRE #(.INIT(1'b0)) ff3 (.C(clk_i), .R(1'b0), .CE((up_i ^ dw_i) 
+    | ld_i), .D((ld_i & Din_i[3]) | (~ld_i & S_w[3])), .Q(Q_w[3]));
+
+    assign Q_o   = Q_w;
+    
+    
+    assign utc_o = &Q_w;
+    assign dtc_o = ~(|Q_w);
+
+endmodule
+    

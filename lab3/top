@@ -1,0 +1,82 @@
+module lab3_top(
+	input btnC, 	
+	input btnU, 	
+	input clkin,	
+	input btnD, 	
+	input btnR, 	
+	input btnL,
+	input [15:0] sw,
+	output [15:0] led,
+	output [3:0] an,
+	output [6:0] seg,
+	output dp
+	);
+
+	assign led [15:1] = 0;
+	assign dp = 1;
+	
+	hex7seg display (
+    	.N_i(H_w),
+    	.Seg_o(seg)
+	);
+	
+	labCnt_clks slowit (
+    	.clkin(clkin),
+    	.greset(btnR),
+    	.clk(clk),
+    	.digsel(digsel)
+	);
+	
+	wire buttonDown_w;
+	edgeDetector buttonDown (
+        .clk_i(clk),
+	    .button_o(btnD),
+	    .edge_o(buttonDown_w)
+	);
+
+	wire buttonUp_w;
+	edgeDetector buttonUp (
+	    .clk_i(clk),
+	    .button_o(btnU),
+	    .edge_o(buttonUp_w)
+	);
+
+	wire [3:0] ringCounter_w;
+	ringCounter ringCounter (
+	    .clk_i(clk),
+    	.advance_i(digsel),
+    	.ring_o(ringCounter_w)
+	);
+	   
+	wire [15:0] fffc = ~(Q_w ^ 16'hFFFC);
+    wire range = &fffc;  
+	wire max = (btnC & ~range) | buttonUp_w;
+
+
+	wire [15:0] Q_w;
+	countUD16 counter (
+	    .up_i(max),
+	    .ld_i(btnL),
+	    .dw_i(buttonDown_w),
+	    .clk_i(clk),
+	    .Din_i(sw[14:0]),
+	    .Q_o(Q_w),
+	    .utc_o(led[15]),
+	    .dtc_o(led[0])
+);
+
+	wire [3:0] H_w;
+	selector select (
+    	.N_i({1'b0, Q_w}),
+    	.Sel_i(ringCounter_w),
+    	.H_o(H_w)
+	);
+    
+
+	assign an = ~ringCounter_w;
+
+
+endmodule
+
+
+

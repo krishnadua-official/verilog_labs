@@ -1,0 +1,54 @@
+`timescale 1ns / 1ps
+
+
+module Lab2_top(
+    input [7:0] sw,
+    input btnU,
+    input btnR,
+    input clkin,
+    output [6:0] seg,
+    output dp,
+    output [3:0] an,
+    output [7:0] led
+    );
+    
+    wire dig_sel, ovfl;
+    wire [7:0] SC;
+    wire [6:0] hex7seg1, hex7seg2;
+
+
+    assign an[3:2] = 2'b11;
+    assign an[1] = ~dig_sel;
+    assign an[0] = dig_sel;
+    
+    
+    
+    assign led = sw;
+    assign dp = ~ovfl;
+   
+    // instantiating the signchanger module   
+    SignChanger SignChange (.A_i(sw), 
+                    .sign_i(btnU), 
+                    .D_i(SC), 
+                    .ovfl_o(ovfl));
+                    
+    // instantiating the hex7seg module for the lower switches
+    hex7seg upper (.N_i(SC[7:4]), 
+                   .Seg_o(hex7seg1));
+                   
+    // same for the higher switches               
+    hex7seg lower (.N_i(SC[3:0]), 
+                   .Seg_o(hex7seg2));
+                   
+    // instantiating the mux8bit module               
+    mux muxb (.s(dig_sel), 
+                  .i0({1'b0,hex7seg2}), 
+                  .i1({1'b0,hex7seg1}), .changer(seg));
+    
+    // reaching into the digsel file.
+    lab2_digsel dig (.clkin(clkin), 
+                    .greset(btnR), 
+                    .digsel(dig_sel));
+    
+endmodule
+

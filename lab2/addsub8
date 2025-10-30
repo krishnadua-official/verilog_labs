@@ -1,0 +1,23 @@
+`timescale 1ns / 1ps
+
+
+
+module AddSub8(
+    input [7:0] A_i,
+    input [7:0] B_i,
+    input sub_i,
+    output [7:0] S_o,
+    output ovfl_o
+    );
+    wire [7:0] inv;
+    
+    
+    
+    assign inv = B_i[7:0] ^ {8{sub_i}};
+    
+    Add8 A0 (.A_i(A_i),.B_i(inverter), .cin_i(sub_i), .S_o(S_o), .ovfl_o(ovfl_o));
+    
+    
+    
+endmodule
+
